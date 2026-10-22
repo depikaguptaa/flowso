@@ -124,10 +124,11 @@ export const validateComponents: Rule = (context) => {
     }
     // Footers in mutually exclusive branches never render together, so the one-Footer
     // rule only applies between footers that can share a render path.
-    for (let index = 1; index < footers.length; index += 1) {
-      const entry = footers[index] as ComponentEntry;
-      const conflicts = footers.slice(0, index).some((other) => !branchesAreExclusive(other.branchPath, entry.branchPath));
+    const earlierFooters: ComponentEntry[] = [];
+    for (const entry of footers) {
+      const conflicts = earlierFooters.some((other) => !branchesAreExclusive(other.branchPath, entry.branchPath));
       if (conflicts) addIssue(context, 'INVALID_FOOTER_POSITION', entry.path, 'at most one Footer is allowed per screen');
+      earlierFooters.push(entry);
     }
     for (const path of pickers.slice(1)) {
       addIssue(context, 'COMPONENT_LIMIT_EXCEEDED', path, 'at most one PhotoPicker or DocumentPicker should be used per screen', 'warning');
